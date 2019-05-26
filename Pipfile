@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+scrapy = "*"
+
+[dev-packages]
+isort = "*"
+black = "*"
+pylint = "*"
+ipython = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-twisted = "*"
+pytest-xdist = "*"
+tox = "*"
