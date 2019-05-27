@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
+"""
+The parsers used in ItemLoader and Item's processors
+"""
 
-# Define here the models for your scraped items
-#
-# See documentation in:
-# https://doc.scrapy.org/en/latest/topics/items.html
-
-import scrapy
+from scrapy.item import Item
 
 
-class SWhoscoredItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class WhoScoredItem(Item):
+    """
+    The item which store all data extracted from web pages
+    """
