@@ -103,5 +103,12 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+.idea/
+
+docker/MongoDB/mongo-db/
+docker/MongoDB/mongo-home/
+docker/Sentry/postgres-data/
+docker/Sentry/redis-data/
+
 Pipfile.lock
 s_whoscored/settings/sentry.py
