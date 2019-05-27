@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 scrapy = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 isort = "*"
