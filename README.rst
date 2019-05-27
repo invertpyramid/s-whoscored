@@ -49,6 +49,46 @@ Requirements
 Usage
 =====
 
+Run Sentry
+----------
+
+Initial postgres with senty first:
+
+1. Generate secret key first:
+::
+    docker run --rm sentry config generate-secret-key
+
+2. Use the secret key to create a database in postgres:
+::
+    docker run --detach \
+        --name sentry-redis-init \
+        --volume $PWD/redis-data:/data \
+        redis
+    docker run --detach \
+        --name sentry-postgres-init \
+        --env POSTGRES_PASSWORD=secret \
+        --env POSTGRES_USER=sentry \
+        --volume $PWD/postgres-data:/var/lib/postgresql/data \
+        postgres
+    docker run --interactive --tty --rm \
+        --env SENTRY_SECRET_KEY='<secret-key>' \
+        --link sentry-postgres-init:postgres \
+        --link sentry-redis-init:redis \
+        sentry upgrade
+
+Then input the superusername and password
+
+3. Stop the redis and postgres:
+::
+    docker stop sentry-postgres-init sentry-redis-init && docker rm sentry-postgres-init senty-redis-init
+
+4. Edit the env files to add the superusername, password and database related
+   information
+
+5. Start sentry with docker-compose.yml:
+::
+    docker-compose up --detach && docker-compose logs --follow
+
 TODO
 ====
 
