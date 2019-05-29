@@ -105,8 +105,11 @@ venv.bak/
 
 .idea/
 
+# docker volumes may be used in this project
 docker/MongoDB/mongo-db/
 docker/MongoDB/mongo-home/
+docker/Percona-Server-MongoDB/psmdb-db/
+docker/Percona-Server-MongoDB/psmdb-home/
 docker/Sentry/postgres-data/
 docker/Sentry/redis-data/
 

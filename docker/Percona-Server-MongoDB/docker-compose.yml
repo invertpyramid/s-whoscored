@@ -1,0 +1,37 @@
+version: "3"
+services:
+  # https://hub.docker.com/r/percona/percona-server-mongodb
+  percona-server-mongodb:
+    command: --storageEngine inMemory
+    container_name: dc-psmdb-whoscored
+    image: percona/percona-server-mongodb:latest
+    networks:
+      - psmdb
+    ports:
+      - "127.0.0.1:27020:27017"
+    restart: always
+    tty: true
+    volumes:
+      - ./psmdb-db:/data/db
+      - ./psmdb-home:/home/mongodb
+  # https://hub.docker.com/_/mongo-express/
+  mongo-express:
+    container_name: dc-psmd-express-whoscored
+    depends_on:
+      - percona-server-mongodb
+    environment:
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_SERVER: dc-psmdb-whoscored
+    image: mongo-express:latest
+    links:
+      - percona-server-mongodb
+    networks:
+      - psmdb
+    ports:
+      - "127.0.0.1:8083:8081"
+    restart: always
+    tty: true
+
+networks:
+  psmdb:
+    driver: bridge
