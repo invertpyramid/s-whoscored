@@ -4,7 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+py-mini-racer = "*"
 scrapy = "*"
+scrapy-cookies = "*"
+scrapy-httpproxy = "*"
 sentry-sdk = "*"
 
 [dev-packages]
@@ -12,6 +15,7 @@ isort = "*"
 black = "*"
 pylint = "*"
 ipython = "*"
+mitmproxy = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-twisted = "*"
