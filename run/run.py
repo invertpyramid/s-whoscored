@@ -5,9 +5,21 @@ import sys
 from asyncio import get_event_loop
 from pathlib import Path
 
+import pyppeteer.connection
 from scrapy.utils.misc import load_object
 from scrapy.utils.project import get_project_settings
 from twisted.internet import asyncioreactor
+
+original_method = pyppeteer.connection.websockets.client.connect
+
+
+def new_method(*args, **kwargs):
+    kwargs["ping_interval"] = None
+    kwargs["ping_timeout"] = None
+    return original_method(*args, **kwargs)
+
+
+pyppeteer.connection.websockets.client.connect = new_method
 
 sys.path.append(str(Path("/").joinpath(*Path(__file__).parts[:-2])))
 
