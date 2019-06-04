@@ -89,6 +89,24 @@ Then input the superusername and password
 ::
     docker-compose up --detach && docker-compose logs --follow
 
+Run MongoDB for httpcache
+-------------------------
+
+Run Percona Server MongoDB for cookies
+--------------------------------------
+
+Debug with mitmproxy
+====================
+
+Start mitmproxy
+---------------
+
+Enable httpproxy middleware
+---------------------------
+
+Debug in mitmproxy
+------------------
+
 TODO
 ====
 
