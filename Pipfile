@@ -7,8 +7,10 @@ name = "pypi"
 py-mini-racer = "*"
 scrapy = "*"
 scrapy-cookies = "*"
+scrapy-httpcache = "*"
 scrapy-httpproxy = "*"
 sentry-sdk = "*"
+txmongo = "*"
 
 [dev-packages]
 isort = "*"
