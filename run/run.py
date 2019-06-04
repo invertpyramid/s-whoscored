@@ -2,15 +2,22 @@
 run script for this scrapy project
 """
 import sys
+from asyncio import get_event_loop
 from pathlib import Path
 
-from scrapy.crawler import CrawlerProcess
+from scrapy.utils.misc import load_object
 from scrapy.utils.project import get_project_settings
+from twisted.internet import asyncioreactor
 
 sys.path.append(str(Path("/").joinpath(*Path(__file__).parts[:-2])))
 
+asyncioreactor.install(get_event_loop())
+
+CrawlerProcess = load_object("s_whoscored.crawler.CrawlerProcess")
+
 modules = [
     "s_whoscored.settings.autothrottle",
+    "s_whoscored.settings.block_inspector",
     "s_whoscored.settings.concurrent",
     "s_whoscored.settings.cookies",
     "s_whoscored.settings.httpcache",
