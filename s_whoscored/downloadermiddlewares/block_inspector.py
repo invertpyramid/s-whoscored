@@ -8,8 +8,7 @@ from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
 
-from s_whoscored.downloadermiddlewares import (as_deferred,
-                                               validate_response_body)
+from s_whoscored.downloadermiddlewares import as_deferred, validate_response
 
 
 class BlockInspectorMiddleware:
@@ -24,7 +23,7 @@ class BlockInspectorMiddleware:
 
     @as_deferred
     async def process_response(
-            self, response: Response, request: Request, spider: Spider
+        self, response: Response, request: Request, spider: Spider
     ) -> Response:
         """
 
@@ -37,7 +36,7 @@ class BlockInspectorMiddleware:
         :return:
         :rtype:
         """
-        if await validate_response_body(response):
+        if await validate_response(response):
             return response
         else:
             raise IgnoreRequest
