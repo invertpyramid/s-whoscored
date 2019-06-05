@@ -20,7 +20,7 @@ def as_deferred(func):
     return wrapper
 
 
-async def validate_response_body(response: Union[Response, Page]) -> bool:
+async def validate_response(response: Union[Response, Page]) -> bool:
     if isinstance(response, Page):
         content: str = await response.content()
         body: bytes = content.encode()
