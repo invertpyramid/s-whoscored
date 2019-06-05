@@ -1,18 +1,19 @@
 import functools
 from asyncio.events import get_event_loop
+from asyncio.futures import Future
 from asyncio.tasks import ensure_future
-from typing import List, Union
+from typing import Callable, List, Union
 
 from pyppeteer.page import Page
 from scrapy.http import HtmlResponse, Response
 from twisted.internet.defer import Deferred
 
 
-def as_future(d):
+def as_future(d: Deferred) -> Future:
     return d.asFuture(get_event_loop())
 
 
-def as_deferred(func):
+def as_deferred(func) -> Callable[..., Deferred]:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return Deferred.fromFuture(ensure_future(func(*args, **kwargs)))
