@@ -1,9 +1,9 @@
+import asyncio
 from asyncio import Future
 from unittest import TestCase
 
-import pytest
 from scrapy.http import HtmlResponse as SHtmlResponse
-from twisted.internet.defer import Deferred, inlineCallbacks
+from twisted.internet.defer import Deferred
 
 from s_whoscored.downloadermiddlewares import as_deferred, as_future, validate_response
 from tests import RESPONSE_FAILED, RESPONSE_SUCCEED
@@ -16,10 +16,17 @@ class DownloaderMiddlewaresTest(TestCase):
         with RESPONSE_SUCCEED.open("rb") as f:
             self.s_response_succeed = SHtmlResponse(url="", body=f.read())
 
-    @pytest.mark.asyncio
-    async def test_validate_response_body(self):
-        self.assertFalse(await validate_response(self.s_response_failed))
-        self.assertTrue(await validate_response(self.s_response_succeed))
+    def test_validate_response(self):
+        loop = asyncio.get_event_loop()
+
+        async def test_validate_response():
+            s_response_failed = await validate_response(self.s_response_failed)
+            self.assertFalse(s_response_failed)
+            s_response_succeed = await validate_response(self.s_response_succeed)
+            self.assertTrue(s_response_succeed)
+
+        loop.run_until_complete(test_validate_response())
+        loop.close()
 
     def test_as_deferred(self):
         async def func():
