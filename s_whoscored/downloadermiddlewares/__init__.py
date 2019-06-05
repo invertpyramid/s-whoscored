@@ -9,16 +9,16 @@ from scrapy.http import HtmlResponse, Response
 from twisted.internet.defer import Deferred
 
 
-def as_future(d: Deferred) -> Future:
-    return d.asFuture(get_event_loop())
-
-
 def as_deferred(func) -> Callable[..., Deferred]:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return Deferred.fromFuture(ensure_future(func(*args, **kwargs)))
 
     return wrapper
+
+
+def as_future(d: Deferred) -> Future:
+    return d.asFuture(get_event_loop())
 
 
 async def validate_response(response: Union[Response, Page]) -> bool:
