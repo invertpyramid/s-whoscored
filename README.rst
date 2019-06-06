@@ -107,6 +107,13 @@ Enable httpproxy middleware
 Debug in mitmproxy
 ------------------
 
+Server-side Replay
+~~~~~~~~~~~~~~~~~
+
+Follow Features of mitmproxy:
+
+https://docs.mitmproxy.org/stable/overview-features/#server-side-replay
+
 TODO
 ====
 
