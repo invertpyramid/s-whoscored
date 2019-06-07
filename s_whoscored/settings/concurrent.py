@@ -1,3 +1,8 @@
+"""
+Concurrent restriction in this spider
+
+In order to limit the visit pressure by this spider, the concurrent is set to 1
+"""
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 

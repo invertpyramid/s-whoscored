@@ -1,3 +1,9 @@
+"""
+Configure pyppeteer in this spider
+
+ * remove websocket timeout restriction
+ * set pyppeteer logger level to WARNING
+"""
 import logging
 
 import pyppeteer.connection
@@ -7,6 +13,12 @@ original_method = pyppeteer.connection.websockets.client.connect
 
 
 def new_method(*args, **kwargs):
+    """
+    Remove websocket timeout restriction in pyppeteer
+    :param args:
+    :param kwargs:
+    :return:
+    """
     kwargs["ping_interval"] = None
     kwargs["ping_timeout"] = None
     return original_method(*args, **kwargs)

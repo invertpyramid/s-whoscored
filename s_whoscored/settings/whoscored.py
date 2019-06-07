@@ -1,3 +1,6 @@
+"""
+WhoScored related settings
+"""
 REGIONS = {
     (252, 2),  # England, Premier League
     (108, 5),  # Italy, Serie A
