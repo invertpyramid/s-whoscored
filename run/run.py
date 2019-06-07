@@ -21,10 +21,10 @@ modules = [
     "s_whoscored.settings.concurrent",
     "s_whoscored.settings.cookies",
     "s_whoscored.settings.httpcache",
-    "s_whoscored.settings.httpproxy",
+    # "s_whoscored.settings.httpproxy",
     "s_whoscored.settings.log",
     "s_whoscored.settings.pyppeteer",
-    "s_whoscored.settings.sentry",
+    # "s_whoscored.settings.sentry",
     "s_whoscored.settings.user_agent",
     "s_whoscored.settings.whoscored",
 ]
