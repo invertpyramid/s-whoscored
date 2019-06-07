@@ -53,4 +53,3 @@ class WhoScoredStatisticsSpider(Spider):
         @url https://www.whoscored.com/Regions/252/Tournaments/2/England-Premier-League
         @returns requests 0
         """
-        pass
