@@ -19,4 +19,7 @@ class BlockInspectorMiddleware(TestCase):
         pass
 
     def test_process_response(self):
-        pass
+        """
+        Test the method of process_response
+        :return:
+        """

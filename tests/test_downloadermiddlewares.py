@@ -1,3 +1,6 @@
+"""
+Testcase for downloadermiddlewares modules
+"""
 import asyncio
 from asyncio import Future
 from unittest import TestCase
@@ -10,13 +13,21 @@ from tests import RESPONSE_FAILED, RESPONSE_SUCCEED
 
 
 class DownloaderMiddlewaresTest(TestCase):
+    """
+    The testcase for downloadermiddlewares modules
+    """
+
     def setUp(self) -> None:
-        with RESPONSE_FAILED.open("rb") as f:
-            self.s_response_failed = SHtmlResponse(url="", body=f.read())
-        with RESPONSE_SUCCEED.open("rb") as f:
-            self.s_response_succeed = SHtmlResponse(url="", body=f.read())
+        with RESPONSE_FAILED.open("rb") as file:
+            self.s_response_failed = SHtmlResponse(url="", body=file.read())
+        with RESPONSE_SUCCEED.open("rb") as file:
+            self.s_response_succeed = SHtmlResponse(url="", body=file.read())
 
     def test_as_deferred(self):
+        """
+        Test the function as_deferred, which convert Future to Deferred
+        """
+
         async def func():
             pass
 
@@ -24,11 +35,18 @@ class DownloaderMiddlewaresTest(TestCase):
         self.assertIsInstance(decorated_func(), Deferred)
 
     def test_as_future(self):
-        d = Deferred()
-        decorated_d = as_future(d)
+        """
+        Test the function as_future, which convert Deferred to Future
+        """
+        deferred = Deferred()
+        decorated_d = as_future(deferred)
         self.assertIsInstance(decorated_d, Future)
 
     def test_validate_response(self):
+        """
+        Test the function of validate_response
+        :return:
+        """
         loop = asyncio.get_event_loop()
 
         async def test_validate_response():
