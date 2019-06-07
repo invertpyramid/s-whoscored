@@ -37,6 +37,6 @@ if __name__ == "__main__":
 
     process = CrawlerProcess(settings=settings)
 
-    process.crawl("WhoScored")
+    process.crawl("WhoScored Statistic")
 
     process.start()
