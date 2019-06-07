@@ -1,4 +1,10 @@
+py-mini-racer
 pyppeteer
 scrapy
+scrapy-cookies
+scrapy-httpcache
+scrapy-httpproxy
+sentry-sdk
 twisted
+txmongo
 websockets
