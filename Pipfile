@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 py-mini-racer = "*"
+pyppeteer = "*"
 scrapy = "*"
 scrapy-cookies = "*"
 scrapy-httpcache = "*"
