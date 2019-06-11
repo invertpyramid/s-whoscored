@@ -1,5 +1,11 @@
 """
-run script for this scrapy project
+Run script for this scrapy project
+
+ * To use `async` and `await` keywords in twisted, asyncioreactor is adopted,
+   and it must be imported before any import including twisted reactor
+ * To keep the code style, use `load_object` to import the customized class
+   `CrawlerProcess`
+
 """
 import sys
 from asyncio import get_event_loop
