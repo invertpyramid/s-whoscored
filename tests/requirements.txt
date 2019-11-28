@@ -1,0 +1,6 @@
+pytest
+pytest-benchmark
+pytest-cov
+pytest-sugar
+pytest-twisted
+pytest-xdist

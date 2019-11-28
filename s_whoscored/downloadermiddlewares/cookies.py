@@ -2,6 +2,8 @@
 The customized cookies downloader middleware
 
 """
+from __future__ import annotations
+
 import logging
 from typing import Optional
 
@@ -19,14 +21,14 @@ class CookiesMiddleware(CM_Origin):
     """
     The customized cookies downloader middleware
     """
+
     def __init__(self, settings: Settings):
         super(CookiesMiddleware, self).__init__(settings=settings)
         self.browser: Optional[Browser] = None
 
     @classmethod
-    def from_crawler(cls, crawler: Crawler):
-        obj = super().from_crawler(crawler=crawler)
-        return obj
+    def from_crawler(cls, crawler: Crawler) -> CookiesMiddleware:
+        return super().from_crawler(crawler=crawler)
 
     @as_deferred
     async def spider_opened(self, signal: object, sender: Crawler, spider: Spider):
@@ -34,8 +36,8 @@ class CookiesMiddleware(CM_Origin):
         self.browser = await launch(headless=False, logLevel=logging.WARNING)
 
     @as_deferred
-    async def spider_closed(
-            self, signal: object, sender: Crawler, reason: str, spider: Spider
+    async def spider_closed(  # pylint: disable=bad-continuation
+        self, signal: object, sender: Crawler, reason: str, spider: Spider
     ):
         super(CookiesMiddleware, self).spider_closed(spider=spider)
         await self.browser.close()

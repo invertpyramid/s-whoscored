@@ -1,6 +1,7 @@
 """
 A middleware for block inspection by response
 """
+from __future__ import annotations
 
 from scrapy.crawler import Crawler
 from scrapy.exceptions import IgnoreRequest
@@ -21,7 +22,7 @@ class BlockInspectorMiddleware:
         self.settings: Settings = crawler.settings
 
     @classmethod
-    def from_crawler(cls, crawler: Crawler):
+    def from_crawler(cls, crawler: Crawler) -> BlockInspectorMiddleware:
         """
         Initial a middleware instance with crawler
         :param crawler:
@@ -29,12 +30,11 @@ class BlockInspectorMiddleware:
         :return:
         :rtype: BlockInspectorMiddleware
         """
-        obj = cls(crawler=crawler)
-        return obj
+        return cls(crawler=crawler)
 
     @as_deferred
-    async def process_response(
-            self, response: Response, request: Request, spider: Spider
+    async def process_response(  # pylint: disable=bad-continuation
+        self, response: Response, request: Request, spider: Spider
     ) -> Response:
         """
         Inspect block by the content of response

@@ -10,7 +10,9 @@ Run script for this scrapy project
 import sys
 from asyncio import get_event_loop
 from pathlib import Path
+from typing import List
 
+from scrapy.settings import Settings
 from scrapy.utils.misc import load_object
 from scrapy.utils.project import get_project_settings
 from twisted.internet import asyncioreactor
@@ -21,7 +23,7 @@ asyncioreactor.install(get_event_loop())
 
 CrawlerProcess = load_object("s_whoscored.crawler.CrawlerProcess")
 
-modules = [
+modules: List[str] = [
     "s_whoscored.settings.autothrottle",
     "s_whoscored.settings.block_inspector",
     "s_whoscored.settings.concurrent",
@@ -36,12 +38,13 @@ modules = [
 ]
 
 if __name__ == "__main__":
-    settings = get_project_settings()
+    settings: Settings = get_project_settings()
 
+    module: str
     for module in modules:
         settings.setmodule(module=module)
 
-    process = CrawlerProcess(settings=settings)
+    process: CrawlerProcess = CrawlerProcess(settings=settings)
 
     process.crawl("WhoScored Statistic")
 

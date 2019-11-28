@@ -3,12 +3,11 @@ The spider scrapes WhoScored Statistics page
 """
 import re
 from collections import namedtuple
-from typing import Generator
+from typing import Generator, List
 
 from py_mini_racer.py_mini_racer import MiniRacer
 from scrapy.http import Request, Response
 from scrapy.spiders import Spider
-
 
 P_TOUR = re.compile(r"var\sallRegions\s=\s(?P<tournaments>.+?);", flags=re.DOTALL)
 P_TEAM = re.compile(
@@ -80,9 +79,9 @@ class WhoScoredStatisticsSpider(Spider):
     Statistics page
     """
 
-    name = "WhoScored Statistic"
+    name: str = "WhoScored Statistic"
 
-    def start_requests(self):
+    def start_requests(self) -> Generator[Request, None, None]:
         yield Request(
             url="https://www.whoscored.com/Statistics",
             callback=self.parse,
@@ -102,15 +101,15 @@ class WhoScoredStatisticsSpider(Spider):
         @url https://www.whoscored.com/Statistics
         @returns requests 1
         """
-        js_script = response.css("#layout-wrapper > script::text").extract_first()
-        tournaments = P_TOUR.search(js_script).group("tournaments")
+        js_script: str = response.css("#layout-wrapper > script::text").extract_first()
+        tournaments: str = P_TOUR.search(js_script).group("tournaments")
 
         ctx = MiniRacer()
         for region in ctx.eval(tournaments):
             for tournament in filter(lambda x: x["name"], region["tournaments"]):
                 if (region["id"], tournament["id"]) in self.settings.get(
-                        "REGIONS", {(252, 2)}  # England, Premier League (as default)
-                ):
+                    "REGIONS", {(252, 2)}  # pylint: disable=bad-continuation
+                ):  # England, Premier League (as default)
                     yield response.follow(
                         tournament["url"], callback=self.parse_tournaments
                     )
@@ -135,16 +134,17 @@ class WhoScoredStatisticsSpider(Spider):
         #     yield response.follow(url, callback=self.parse_season)
 
         # This is to go for method 2
-        js_script = response.xpath(
+        js_script: str = response.xpath(
             '//*[@id="layout-content-wrapper"]/div[2]/script[4]'
         ).extract_first()
 
         ctx = MiniRacer()
+        team: List
         for team in ctx.eval(P_TEAM.search(js_script).group("history")):
-            _team = Team(*team)
+            team_: Team = Team(*team)
             yield response.follow(
                 url="https://www.whoscored.com/Teams/{id}/Fixtures/".format(
-                    id=_team.id
+                    id=team_.id
                 ),
                 callback=self.parse_team,
             )
@@ -171,16 +171,17 @@ class WhoScoredStatisticsSpider(Spider):
         @url https://www.whoscored.com/Teams/167/Fixtures/England-Manchester-City
         @returns requests 0
         """
-        js_scrpit = response.xpath(
+        js_script: str = response.xpath(
             '//*[@id="layout-content-wrapper"]/div[2]/script[3]'
         ).extract_first()
 
         ctx = MiniRacer()
 
-        for fixture in ctx.eval(P_TEAM_FIXTURES.search(js_scrpit).group("fixtures")):
-            _fixture = Match(*fixture)
+        fixture: List
+        for fixture in ctx.eval(P_TEAM_FIXTURES.search(js_script).group("fixtures")):
+            fixture_: Match = Match(*fixture)
             yield response.follow(
-                url="https://www.whoscored.com/Matches/{id}/".format(id=_fixture.id),
+                url="https://www.whoscored.com/Matches/{id}/".format(id=fixture_.id),
                 callback=self.parse_match,
             )
 

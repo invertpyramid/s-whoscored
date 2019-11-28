@@ -11,7 +11,9 @@ scrapy-cookies = "*"
 scrapy-httpcache = "*"
 scrapy-httpproxy = "*"
 sentry-sdk = "*"
+twisted = "*"
 txmongo = "*"
+websockets = "*"
 
 [dev-packages]
 bandit = "*"
