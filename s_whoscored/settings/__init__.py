@@ -1,27 +1,29 @@
 """
 The basic settings for this spider
 """
-BOT_NAME = "s_whoscored"
+from typing import Dict, List
 
-SPIDER_MODULES = ["s_whoscored.spiders"]
-NEWSPIDER_MODULE = "s_whoscored.spiders"
+BOT_NAME: str = "s_whoscored"
+
+SPIDER_MODULES: List[str] = ["s_whoscored.spiders"]
+NEWSPIDER_MODULE: str = "s_whoscored.spiders"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+ROBOTSTXT_OBEY: bool = False
 
 # Disable Telnet Console (enabled by default)
-# TELNETCONSOLE_ENABLED = False
+# TELNETCONSOLE_ENABLED: bool = False
 
 # Override the default request headers:
-# DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
+# DEFAULT_REQUEST_HEADERS: Dict[str, str] = {
+#     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+#     "Accept-Language": "en",
 # }
 
-SPIDER_MIDDLEWARES = {}
+SPIDER_MIDDLEWARES: Dict[str, int] = {}
 
-DOWNLOADER_MIDDLEWARES = {}
+DOWNLOADER_MIDDLEWARES: Dict[str, int] = {}
 
-EXTENSIONS = {}
+EXTENSIONS: Dict[str, int] = {}
 
-ITEM_PIPELINES = {}
+ITEM_PIPELINES: Dict[str, int] = {}
