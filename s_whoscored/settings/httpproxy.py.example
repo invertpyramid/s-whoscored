@@ -1,6 +1,8 @@
 """
 middlewares configuration for this spider
 """
+from typing import Dict, List
+
 from s_whoscored.settings import DOWNLOADER_MIDDLEWARES
 
 DOWNLOADER_MIDDLEWARES.update(
@@ -10,8 +12,8 @@ DOWNLOADER_MIDDLEWARES.update(
     }
 )
 
-HTTPPROXY_STORAGE = "scrapy_httpproxy.storage.settings.SettingsStorage"
-HTTPPROXY_PROXIES = {
+HTTPPROXY_STORAGE: str = "scrapy_httpproxy.storage.settings.SettingsStorage"
+HTTPPROXY_PROXIES: Dict[str, List[str]] = {
     "http": ["http://127.0.0.1:58888"],
     "https": ["https://127.0.0.1:58888"],
 }
