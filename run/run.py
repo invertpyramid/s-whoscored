@@ -17,7 +17,7 @@ from scrapy.utils.misc import load_object
 from scrapy.utils.project import get_project_settings
 from twisted.internet import asyncioreactor
 
-sys.path.append(str(Path("/").joinpath(*Path(__file__).parts[:-2])))
+sys.path.append(str(Path().absolute()))
 
 asyncioreactor.install(get_event_loop())
 
