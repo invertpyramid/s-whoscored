@@ -1,7 +1,29 @@
 """
 The basic settings for this spider
 """
-from typing import Dict, List
+import os
+from typing import Any, Dict, List
+
+from s_whoscored.exceptions import WhoScoredSettingsMissingException
+
+
+def get_env(var: str, default: Any = None) -> Any:
+    """
+    Get the given variable's value from the environment
+    :param var:
+    :type var: str
+    :param default:
+    :type default: Any
+    :return:
+    :rtype: Any
+    """
+    try:
+        return os.environ[var]
+    except KeyError as exc:
+        if default is None:
+            raise WhoScoredSettingsMissingException from exc
+        return default
+
 
 BOT_NAME: str = "s_whoscored"
 
