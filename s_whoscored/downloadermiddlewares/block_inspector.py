@@ -3,6 +3,8 @@ A middleware for block inspection by response
 """
 from __future__ import annotations
 
+import logging
+
 from scrapy.crawler import Crawler
 from scrapy.exceptions import IgnoreRequest
 from scrapy.http import Request, Response
@@ -10,6 +12,8 @@ from scrapy.settings import Settings
 from scrapy.spiders import Spider
 
 from s_whoscored.downloadermiddlewares import as_deferred, validate_response
+
+logger = logging.getLogger(__name__)
 
 
 class BlockInspectorMiddleware:
