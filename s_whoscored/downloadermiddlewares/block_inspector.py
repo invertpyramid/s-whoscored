@@ -9,6 +9,7 @@ from scrapy.crawler import Crawler
 from scrapy.exceptions import IgnoreRequest
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
+from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
 
 from s_whoscored.downloadermiddlewares import as_deferred, validate_response
@@ -34,7 +35,16 @@ class BlockInspectorMiddleware:
         :return:
         :rtype: BlockInspectorMiddleware
         """
-        return cls(crawler=crawler)
+        obj = cls(crawler=crawler)
+        crawler.signals.connect(obj.spider_opened, spider_opened)
+        crawler.signals.connect(obj.spider_closed, spider_closed)
+        return obj
+
+    def spider_opened(self, spider: Spider) -> None:
+        logger.info("The middleware block inspector is up.")
+
+    def spider_closed(self, spider: Spider) -> None:
+        logger.info("The middleware block inspector is down.")
 
     @as_deferred
     async def process_response(  # pylint: disable=bad-continuation
