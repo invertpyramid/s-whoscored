@@ -9,13 +9,13 @@ services:
     networks:
       - mongo
     ports:
-      - "127.0.0.1:27019:27017"
+      - "127.0.0.1:27017:27017"
     restart: always
     tty: true
     volumes:
       - ./mongo-db:/data/db
       - ./mongo-home:/home/mongodb
-      - ./psmdb-initdb.d:/docker-entrypoint-initdb.d
+      - ./mongo-initdb.d:/docker-entrypoint-initdb.d
   # https://hub.docker.com/_/mongo-express/
   mongo-express:
     container_name: dc-mongodb-express-whoscored
@@ -29,7 +29,7 @@ services:
     networks:
       - mongo
     ports:
-      - "127.0.0.1:8082:8081"
+      - "127.0.0.1:8081:8081"
     restart: always
     tty: true
 

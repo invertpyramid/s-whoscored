@@ -1,4 +1,5 @@
-db = db.getSiblingDB('whoscored'),
+db = db.getSiblingDB('whoscored');
+
 db.createUser({
     user: "whoscored",
     pwd: "whoscoredpassword",
