@@ -14,6 +14,7 @@ services:
     tty: true
     volumes:
       - ./mongo-db:/data/db
+      # mkdir mongo-home && chown `docker run --rm mongo:latest id -u mongodb`:`docker run --rm mongo:latest id -g mongodb` mongo-home
       - ./mongo-home:/home/mongodb
       - ./mongo-initdb.d:/docker-entrypoint-initdb.d
   # https://hub.docker.com/_/mongo-express/
