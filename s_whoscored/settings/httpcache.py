@@ -18,7 +18,7 @@ HTTPCACHE_IGNORE_HTTP_CODES: List[int] = [301, 302, 500, 503]
 HTTPCACHE_STORAGE: str = "scrapy_httpcache.extensions.httpcache_storage.MongoDBCacheStorage"
 
 HTTPCACHE_MONGODB_HOST: str = "127.0.0.1"
-HTTPCACHE_MONGODB_PORT: int = 27019
+HTTPCACHE_MONGODB_PORT: int = 27017
 
 HTTPCACHE_MONGODB_USERNAME: str = "root"
 HTTPCACHE_MONGODB_PASSWORD: str = "xxxxxxxx"
