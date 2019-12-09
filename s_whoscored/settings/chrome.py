@@ -1,10 +1,8 @@
 import logging
 
-from s_whoscored.settings import DOWNLOADER_MIDDLEWARES
+from s_whoscored.settings import EXTENSIONS
 
-DOWNLOADER_MIDDLEWARES.update(
-    {"s_whoscored.downloadermiddlewares.chrome.ChromeMiddleware": 999}
-)
+EXTENSIONS.update({"s_whoscored.extensions.chrome.ChromeExtension": 0})
 
 BROWSER_LEVEL = logging.WARNING
 WS_P_LOG_LEVEL = logging.WARNING
