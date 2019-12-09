@@ -24,6 +24,11 @@ class BlockInspectorMiddleware:
     """
 
     def __init__(self, crawler: Crawler):
+        """
+
+        :param crawler:
+        :type crawler: Crawler
+        """
         self.crawler: Crawler = crawler
         self.settings: Settings = crawler.settings
 
@@ -42,12 +47,31 @@ class BlockInspectorMiddleware:
         return obj
 
     def spider_opened(self, spider: Spider) -> None:
+        """
+        :param spider:
+        :type spider: Spider
+        :return:
+        :rtype: None
+        """
         logger.info("The middleware block inspector is up.")
 
     def spider_closed(self, spider: Spider) -> None:
+        """
+        :param spider:
+        :type spider: Spider
+        :return:
+        :rtype: None
+        """
         logger.info("The middleware block inspector is down.")
 
     def _validate_response(self, response: Response) -> bool:
+        """
+
+        :param response:
+        :type response: Response
+        :return:
+        :rtype: bool
+        """
         names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
             "@name"
         ).extract()
