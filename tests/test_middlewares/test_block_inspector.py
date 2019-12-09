@@ -1,9 +1,9 @@
 """
-TestCase for BlockInspectorMiddleware
+The test case for BlockInspectorMiddleware
 """
 
-from unittest import TestCase, mock
-from unittest.mock import MagicMock
+from unittest.case import TestCase
+from unittest.mock import MagicMock, patch
 
 from scrapy.exceptions import IgnoreRequest
 from scrapy.http import HtmlResponse, Request
@@ -17,9 +17,7 @@ from tests import RESPONSE_FAILED, RESPONSE_SUCCEED
 
 class BlockInspectorMiddlewareTest(TestCase):
     """
-    TODO: since pytest-twisted does not support asyncio reactor until 1.10, this
-     test case will wait until the follow PR published maybe in the next
-     version: https://github.com/pytest-dev/pytest-twisted/pull/63
+    The test case for block inspector middleware
     """
 
     def setUp(self) -> None:
@@ -48,10 +46,10 @@ class BlockInspectorMiddlewareTest(TestCase):
         req = Request("https://www.whoscored.com/")
         resp = HtmlResponse("https://www.whoscored.com/")
 
-        with mock.patch.object(self.mw, "_validate_response", new=lambda x: True):
+        with patch.object(self.mw, "_validate_response", new=lambda x: True):
             self.assertIs(resp, self.mw.process_response(resp, req, self.spider))
 
-        with mock.patch.object(self.mw, "_validate_response", new=lambda x: False):
+        with patch.object(self.mw, "_validate_response", new=lambda x: False):
             self.crawler.stats.inc_value = MagicMock()
             self.crawler.signals.send_catch_log = MagicMock()
 
