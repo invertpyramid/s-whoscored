@@ -23,7 +23,7 @@ from s_whoscored.signals import response_blocked
 logger = logging.getLogger(__name__)
 
 
-class ChromeMiddleware:
+class ChromeExtension:
     """
     The middleware to operate Chrome Browser
     """
@@ -41,7 +41,7 @@ class ChromeMiddleware:
         self.browser: Optional[Browser] = None
 
     @classmethod
-    def from_crawler(cls, crawler: Crawler) -> ChromeMiddleware:
+    def from_crawler(cls, crawler: Crawler) -> ChromeExtension:
         """
 
         :param crawler:
