@@ -1,11 +1,11 @@
 """
-Testcase for downloadermiddlewares modules
+Test cases for downloadermiddlewares modules
 """
 import asyncio
 from asyncio import Future
 from unittest import TestCase
 
-from scrapy.http import HtmlResponse as SHtmlResponse
+from scrapy.http import HtmlResponse
 from twisted.internet.defer import Deferred
 
 from s_whoscored.downloadermiddlewares import as_deferred, as_future, validate_response
@@ -14,14 +14,14 @@ from tests import RESPONSE_FAILED, RESPONSE_SUCCEED
 
 class DownloaderMiddlewaresTest(TestCase):
     """
-    The testcase for downloadermiddlewares modules
+    The test case for downloadermiddlewares modules
     """
 
     def setUp(self) -> None:
         with RESPONSE_FAILED.open("rb") as file:
-            self.s_response_failed = SHtmlResponse(url="", body=file.read())
+            self.s_response_failed = HtmlResponse(url="", body=file.read())
         with RESPONSE_SUCCEED.open("rb") as file:
-            self.s_response_succeed = SHtmlResponse(url="", body=file.read())
+            self.s_response_succeed = HtmlResponse(url="", body=file.read())
 
     def test_as_deferred(self):
         """
