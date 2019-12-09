@@ -4,6 +4,7 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
+from typing import List
 
 from scrapy.crawler import Crawler
 from scrapy.exceptions import IgnoreRequest
@@ -12,7 +13,6 @@ from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
 
-from s_whoscored.downloadermiddlewares import as_deferred, validate_response
 from s_whoscored.signals import response_blocked
 
 logger = logging.getLogger(__name__)
@@ -47,8 +47,14 @@ class BlockInspectorMiddleware:
     def spider_closed(self, spider: Spider) -> None:
         logger.info("The middleware block inspector is down.")
 
-    @as_deferred
-    async def process_response(  # pylint: disable=bad-continuation
+    def _validate_response(self, response: Response) -> bool:
+        names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
+            "@name"
+        ).extract()
+
+        return "ROBOTS" not in names_in_meta
+
+    def process_response(  # pylint: disable=bad-continuation
         self, response: Response, request: Request, spider: Spider
     ) -> Response:
         """
@@ -62,7 +68,7 @@ class BlockInspectorMiddleware:
         :return:
         :rtype: Response
         """
-        if await validate_response(response):
+        if self._validate_response(response):
             return response
         else:
             self.crawler.stats.inc_value("whoscored/response_blocked")
