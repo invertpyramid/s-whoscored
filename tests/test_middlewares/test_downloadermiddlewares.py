@@ -8,7 +8,7 @@ from unittest import TestCase
 from scrapy.http import HtmlResponse
 from twisted.internet.defer import Deferred
 
-from s_whoscored.downloadermiddlewares import as_deferred, as_future, validate_response
+from s_whoscored.downloadermiddlewares import as_deferred, as_future
 from tests import RESPONSE_FAILED, RESPONSE_SUCCEED
 
 
@@ -41,19 +41,3 @@ class DownloaderMiddlewaresTest(TestCase):
         deferred = Deferred()
         decorated_d = as_future(deferred)
         self.assertIsInstance(decorated_d, Future)
-
-    def test_validate_response(self):
-        """
-        Test the function of validate_response
-        :return:
-        """
-        loop = asyncio.get_event_loop()
-
-        async def test_validate_response():
-            s_response_failed = await validate_response(self.s_response_failed)
-            self.assertFalse(s_response_failed)
-            s_response_succeed = await validate_response(self.s_response_succeed)
-            self.assertTrue(s_response_succeed)
-
-        loop.run_until_complete(test_validate_response())
-        loop.close()
