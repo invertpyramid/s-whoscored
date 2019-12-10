@@ -25,7 +25,7 @@ CrawlerProcess = load_object("s_whoscored.crawler.CrawlerProcess")
 
 modules: List[str] = [
     "s_whoscored.settings.autothrottle",
-    "s_whoscored.settings.block_inspector",
+    "s_whoscored.settings.chrome",
     "s_whoscored.settings.concurrent",
     "s_whoscored.settings.cookies",
     "s_whoscored.settings.httpcache",
