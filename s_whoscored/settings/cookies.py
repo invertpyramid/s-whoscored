@@ -1,6 +1,8 @@
 """
 middlewares configuration for this spider
 """
+import logging
+
 from s_whoscored.settings import DOWNLOADER_MIDDLEWARES, get_env
 
 DOWNLOADER_MIDDLEWARES.update(
@@ -25,3 +27,7 @@ COOKIES_MONGO_MONGOCLIENT_KWARGS = {
     "authSource": "admin",
     "authMechanism": "SCRAM-SHA-1",
 }
+
+BROWSER_LEVEL = logging.WARNING
+WS_P_LOG_LEVEL = logging.WARNING
+WS_C_LOG_LEVEL = logging.WARNING
