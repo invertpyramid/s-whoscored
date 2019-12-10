@@ -4,11 +4,13 @@ The customized cookies downloader middleware
 from __future__ import annotations
 
 import logging
+from copy import copy
 from typing import Any, Dict, List, Optional, Union
 
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
 from pyppeteer.network_manager import Response as PyppeteerResponse
+from pyppeteer.page import Page
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
@@ -140,9 +142,24 @@ class CookiesMiddleware(CM_Origin):
         :return:
         :rtype: Union[Response, Request]
         """
-        # TODO: check the response blocked or not;
-        #  call chrome extension to manually pass the blocking get the validated
+        if self._validate_response(response):
+            return response
+
+        # save the cookie into the backend
+        super(CookiesMiddleware, self).process_response(request, response, spider)
+
+        # read the cookie from the backend
+        req: Request = copy(request)
+        self.process_request(req, spider)
+        cookie: bytes = req.headers["cookie"]
+
+        # TODO: call chrome extension to manually pass the blocking, get the validated
         #  response and cookies from chrome extension
-        return super(CookiesMiddleware, self).process_response(
-            request, response, spider
-        )
+
+        container_response = {}
+
+        page: Page = await self.browser.newPage()
+        page.on("response", lambda x: self._convert_response(x, container_response))
+        await page.setCookie(*self._convert_cookies(request.url, cookie))
+
+        await page.goto(request.url)
