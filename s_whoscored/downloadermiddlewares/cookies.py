@@ -1,20 +1,16 @@
 """
 The customized cookies downloader middleware
-
 """
 from __future__ import annotations
 
-import logging
-from typing import Optional
+from typing import List, Optional, Union
 
-from pyppeteer.browser import Browser
-from pyppeteer.launcher import launch
+from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
 from scrapy_cookies.downloadermiddlewares.cookies import CookiesMiddleware as CM_Origin
 
 from s_whoscored.crawler import Crawler
-from s_whoscored.downloadermiddlewares import as_deferred
 
 
 class CookiesMiddleware(CM_Origin):
@@ -23,21 +19,58 @@ class CookiesMiddleware(CM_Origin):
     """
 
     def __init__(self, settings: Settings):
-        super(CookiesMiddleware, self).__init__(settings=settings)
-        self.browser: Optional[Browser] = None
+        """
+
+        :param settings:
+        :type settings: Settings
+        """
+        super(CookiesMiddleware, self).__init__(settings)
+        self.crawler: Optional[Crawler] = None
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> CookiesMiddleware:
-        return super().from_crawler(crawler=crawler)
+        """
 
-    @as_deferred
-    async def spider_opened(self, signal: object, sender: Crawler, spider: Spider):
-        super(CookiesMiddleware, self).spider_opened(spider=spider)
-        self.browser = await launch(headless=False, logLevel=logging.WARNING)
+        :param crawler:
+        :type crawler: Crawler
+        :return:
+        :rtype: CookiesMiddleware
+        """
+        obj: CookiesMiddleware = super(CookiesMiddleware, cls).from_crawler(crawler)
+        obj.crawler = crawler
+        return obj
 
-    @as_deferred
-    async def spider_closed(  # pylint: disable=bad-continuation
-        self, signal: object, sender: Crawler, reason: str, spider: Spider
-    ):
-        super(CookiesMiddleware, self).spider_closed(spider=spider)
-        await self.browser.close()
+    def _validate_response(self, response: Response) -> bool:
+        """
+
+        :param response:
+        :type response: Response
+        :return:
+        :rtype: bool
+        """
+        names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
+            "@name"
+        ).extract()
+
+        return "ROBOTS" not in names_in_meta
+
+    def process_response(
+        self, request: Request, response: Response, spider: Spider
+    ) -> Union[Response, Request]:
+        """
+
+        :param request:
+        :type request: Request
+        :param response:
+        :type response: Response
+        :param spider:
+        :type spider: Spider
+        :return:
+        :rtype: Union[Response, Request]
+        """
+        # TODO: check the response blocked or not;
+        #  call chrome extension to manually pass the blocking get the validated
+        #  response and cookies from chrome extension
+        return super(CookiesMiddleware, self).process_response(
+            request, response, spider
+        )
