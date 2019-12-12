@@ -99,19 +99,19 @@ class CookiesMiddleware(CM_Origin):
         return cookie_
 
     def _generate_response_args(
-        self, response: PyppeteerResponse, response_args: Dict[str, Any]
+        self, response: PyppeteerResponse, response_kwargs: Dict[str, Any]
     ) -> None:
         """
 
         :param response:
         :type response: PyppeteerResponse
-        :param response_args:
-        :type response_args: Dict[str, Any]
+        :param response_kwargs:
+        :type response_kwargs: Dict[str, Any]
         :return:
         :rtype: None
         """
-        if response.url == response_args["url"]:
-            response_args.update(
+        if response.url == response_kwargs["url"]:
+            response_kwargs.update(
                 {"status": response.status, "headers": response.headers}
             )
 
@@ -160,14 +160,14 @@ class CookiesMiddleware(CM_Origin):
         # TODO: call chrome extension to manually pass the blocking, get the validated
         #  response and cookies from chrome extension
 
-        response_args = {
+        response_kwargs = {
             "url": request.url,
             "flags": copy(request.flags) if request.flags else None,
             "request": request,
         }
 
         page: Page = await self.browser.newPage()
-        page.on("response", lambda x: self._generate_response_args(x, response_args))
+        page.on("response", lambda x: self._generate_response_args(x, response_kwargs))
         await page.setCookie(*self._convert_cookies(request.url, cookie))
 
         await page.goto(request.url)
