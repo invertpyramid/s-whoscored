@@ -98,21 +98,22 @@ class CookiesMiddleware(CM_Origin):
             cookie_.append({"name": key, "value": value, "url": url})
         return cookie_
 
-    def _convert_response(
-        self, response: PyppeteerResponse, container_response: Dict[str, Any]
+    def _generate_response_args(
+        self, response: PyppeteerResponse, response_args: Dict[str, Any]
     ) -> None:
         """
 
         :param response:
         :type response: PyppeteerResponse
-        :param container_response:
-        :type container_response: Dict[str, Any]
+        :param response_args:
+        :type response_args: Dict[str, Any]
         :return:
         :rtype: None
         """
-        container_response.update(
-            {"status": response.status, "headers": response.headers}
-        )
+        if response.url == response_args["url"]:
+            response_args.update(
+                {"status": response.status, "headers": response.headers}
+            )
 
     def _validate_response(self, response: Response) -> bool:
         """
@@ -128,7 +129,8 @@ class CookiesMiddleware(CM_Origin):
 
         return "ROBOTS" not in names_in_meta
 
-    def process_response(
+    @as_deferred
+    async def process_response(
         self, request: Request, response: Response, spider: Spider
     ) -> Union[Response, Request]:
         """
@@ -145,6 +147,8 @@ class CookiesMiddleware(CM_Origin):
         if self._validate_response(response):
             return response
 
+        self.crawler.stats.inc_value("whoscored/blocked")
+
         # save the cookie into the backend
         super(CookiesMiddleware, self).process_response(request, response, spider)
 
@@ -156,10 +160,14 @@ class CookiesMiddleware(CM_Origin):
         # TODO: call chrome extension to manually pass the blocking, get the validated
         #  response and cookies from chrome extension
 
-        container_response = {}
+        response_args = {
+            "url": request.url,
+            "flags": copy(request.flags) if request.flags else None,
+            "request": request,
+        }
 
         page: Page = await self.browser.newPage()
-        page.on("response", lambda x: self._convert_response(x, container_response))
+        page.on("response", lambda x: self._generate_response_args(x, response_args))
         await page.setCookie(*self._convert_cookies(request.url, cookie))
 
         await page.goto(request.url)
