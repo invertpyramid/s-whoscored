@@ -98,7 +98,7 @@ class CookiesMiddleware(CM_Origin):
             cookie_.append({"name": key, "value": value, "url": url})
         return cookie_
 
-    def _generate_response_args(
+    def _process_pyppeteer_response(
         self, response: PyppeteerResponse, response_kwargs: Dict[str, Any]
     ) -> None:
         """
@@ -167,7 +167,9 @@ class CookiesMiddleware(CM_Origin):
         }
 
         page: Page = await self.browser.newPage()
-        page.on("response", lambda x: self._generate_response_args(x, response_kwargs))
+        page.on(
+            "response", lambda x: self._process_pyppeteer_response(x, response_kwargs)
+        )
         await page.setCookie(*self._convert_cookies(request.url, cookie))
 
         await page.goto(request.url)
