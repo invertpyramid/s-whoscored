@@ -57,7 +57,9 @@ class CookiesMiddleware(CM_Origin):
         return obj
 
     @as_deferred
-    async def spider_opened(self, spider: Spider, *args, **kwargs) -> None:
+    async def spider_opened(  # pylint: disable=arguments-differ, bad-continuation, unused-argument
+        self, spider: Spider, *args, **kwargs
+    ) -> None:
         """
 
         :param spider:
@@ -71,7 +73,9 @@ class CookiesMiddleware(CM_Origin):
         )
 
     @as_deferred
-    async def spider_closed(self, spider: Spider, *args, **kwargs) -> None:
+    async def spider_closed(  # pylint: disable=arguments-differ, bad-continuation, unused-argument
+        self, spider: Spider, *args, **kwargs
+    ) -> None:
         """
 
         :param spider:
@@ -98,7 +102,7 @@ class CookiesMiddleware(CM_Origin):
             cookie_.append({"name": key, "value": value, "url": url})
         return cookie_
 
-    def _process_pyppeteer_response(
+    def _process_pyppeteer_response(  # pylint: disable=bad-continuation
         self, response: PyppeteerResponse, response_kwargs: Dict[str, Any]
     ) -> None:
         """
@@ -130,7 +134,7 @@ class CookiesMiddleware(CM_Origin):
         return "ROBOTS" not in names_in_meta
 
     @as_deferred
-    async def process_response(
+    async def process_response(  # pylint: disable=bad-continuation
         self, request: Request, response: Response, spider: Spider
     ) -> Union[Response, Request]:
         """
@@ -173,3 +177,4 @@ class CookiesMiddleware(CM_Origin):
         await page.setCookie(*self._convert_cookies(request.url, cookie))
 
         await page.goto(request.url)
+        await page.waitForSelector(request.meta["waitForSelector"])

@@ -85,7 +85,10 @@ class WhoScoredStatisticsSpider(Spider):
         yield Request(
             url="https://www.whoscored.com/Statistics",
             callback=self.parse,
-            meta={"cookiejar": "whoscored"},
+            meta={
+                "cookiejar": "whoscored",
+                "waitForSelector": "#layout-wrapper > script",
+            },
         )
 
     def parse(self, response: Response) -> Generator[Request, None, None]:
@@ -111,7 +114,9 @@ class WhoScoredStatisticsSpider(Spider):
                     "REGIONS", {(252, 2)}  # pylint: disable=bad-continuation
                 ):  # England, Premier League (as default)
                     yield response.follow(
-                        tournament["url"], callback=self.parse_tournaments
+                        tournament["url"],
+                        callback=self.parse_tournaments,
+                        meta={"waitForSelector": "#layout-content-wrapper"},
                     )
 
     def parse_tournaments(self, response: Response) -> Generator[Request, None, None]:
@@ -147,6 +152,7 @@ class WhoScoredStatisticsSpider(Spider):
                     id=team_.id
                 ),
                 callback=self.parse_team,
+                meta={"waitForSelector": "layout-content-wrapper"}
             )
 
             break
