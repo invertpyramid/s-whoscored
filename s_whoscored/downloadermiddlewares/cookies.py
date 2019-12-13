@@ -3,6 +3,7 @@ The customized cookies downloader middleware
 """
 from __future__ import annotations
 
+import gzip
 import logging
 from copy import copy
 from typing import Any, Dict, List, Optional, Union
@@ -11,6 +12,7 @@ from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
 from pyppeteer.network_manager import Response as PyppeteerResponse
 from pyppeteer.page import Page
+from scrapy.exceptions import NotSupported
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
@@ -102,7 +104,7 @@ class CookiesMiddleware(CM_Origin):
             cookie_.append({"name": key, "value": value, "url": url})
         return cookie_
 
-    def _process_pyppeteer_response(  # pylint: disable=bad-continuation
+    async def _process_pyppeteer_response(  # pylint: disable=bad-continuation
         self, response: PyppeteerResponse, response_kwargs: Dict[str, Any]
     ) -> None:
         """
@@ -115,8 +117,14 @@ class CookiesMiddleware(CM_Origin):
         :rtype: None
         """
         if response.url == response_kwargs["url"]:
+            body: str = await response.text()
+            encoding: str = "utf-8"
             response_kwargs.update(
-                {"status": response.status, "headers": response.headers}
+                {
+                    "status": response.status,
+                    "headers": response.headers,
+                    "body": gzip.compress(body.encode(encoding)),
+                }
             )
 
     def _validate_response(self, response: Response) -> bool:
@@ -127,11 +135,14 @@ class CookiesMiddleware(CM_Origin):
         :return:
         :rtype: bool
         """
-        names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
-            "@name"
-        ).extract()
+        try:
+            names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
+                "@name"
+            ).extract()
 
-        return "ROBOTS" not in names_in_meta
+            return "ROBOTS" not in names_in_meta
+        except NotSupported:
+            return False
 
     @as_deferred
     async def process_response(  # pylint: disable=bad-continuation
@@ -178,3 +189,7 @@ class CookiesMiddleware(CM_Origin):
 
         await page.goto(request.url)
         await page.waitForSelector(request.meta["waitForSelector"])
+
+        resp = Response(**response_kwargs)
+
+        return resp
