@@ -8,7 +8,7 @@ from s_whoscored.settings import DOWNLOADER_MIDDLEWARES, get_env
 DOWNLOADER_MIDDLEWARES.update(
     {
         "scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware": None,
-        "scrapy_httpcache.downloadermiddlewares.httpcache.AsyncHttpCacheMiddleware": 900,
+        "s_whoscored.downloadermiddlewares.httpcache.AsyncHttpCacheMiddleware": 900,
     }
 )
 
