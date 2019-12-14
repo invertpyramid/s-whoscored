@@ -17,11 +17,13 @@ from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
 from scrapy_cookies.downloadermiddlewares.cookies import CookiesMiddleware as CM_Origin
+from scrapy_httpcache.signals import remove_banned
 from websockets.client import logger as WS_C_Logger
 from websockets.protocol import logger as WS_P_Logger
 
 from s_whoscored.crawler import Crawler
 from s_whoscored.downloadermiddlewares import as_deferred
+from s_whoscored.exceptions import WhoScoredResponseBlockedException
 
 logger = logging.getLogger(__name__)
 
@@ -163,6 +165,12 @@ class CookiesMiddleware(CM_Origin):
             return response
 
         self.crawler.stats.inc_value("whoscored/blocked")
+        self.crawler.signals.send_catch_log(
+            remove_banned,
+            spider=spider,
+            response=response,
+            exception=WhoScoredResponseBlockedException,
+        )
 
         # save the cookie into the backend
         super(CookiesMiddleware, self).process_response(request, response, spider)
