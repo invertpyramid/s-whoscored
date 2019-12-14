@@ -6,6 +6,8 @@ from __future__ import annotations
 import gzip
 import logging
 from copy import copy
+from http.cookiejar import Cookie
+from inspect import getfullargspec
 from typing import Any, Dict, List, Optional, Union
 
 from pyppeteer.browser import Browser
@@ -14,6 +16,7 @@ from pyppeteer.network_manager import Response as PyppeteerResponse
 from pyppeteer.page import Page
 from scrapy.exceptions import NotSupported
 from scrapy.http import Request, Response
+from scrapy.http.cookies import CookieJar
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
 from scrapy_cookies.downloadermiddlewares.cookies import CookiesMiddleware as CM_Origin
@@ -26,6 +29,9 @@ from s_whoscored.downloadermiddlewares import as_deferred
 from s_whoscored.exceptions import WhoScoredResponseBlockedException
 
 logger = logging.getLogger(__name__)
+
+CookieArgSpec: List[str] = getfullargspec(Cookie).args
+CookieArgSpec.remove("self")
 
 
 class CookiesMiddleware(CM_Origin):
@@ -106,6 +112,19 @@ class CookiesMiddleware(CM_Origin):
             cookie_.append({"name": key, "value": value, "url": url})
         return cookie_
 
+    async def _extract_cookies(self, cookiejar: CookieJar, page: Page) -> CookieJar:
+        cookies: List[Dict[str, Any]] = await page.cookies()
+
+        cookie: Dict[str, Any]
+        for cookie in cookies:
+            cookie_args = [cookie.get(k, None) for k in CookieArgSpec]
+            index_version = CookieArgSpec.index("version")
+            if cookie_args[index_version] is None:
+                cookie_args[index_version] = 0
+            cookiejar.set_cookie(Cookie(*cookie_args))
+
+        return cookiejar
+
     async def _process_pyppeteer_response(  # pylint: disable=bad-continuation
         self, response: PyppeteerResponse, response_kwargs: Dict[str, Any]
     ) -> None:
@@ -173,7 +192,9 @@ class CookiesMiddleware(CM_Origin):
         )
 
         # save the cookie into the backend
-        super(CookiesMiddleware, self).process_response(request, response, spider)
+        _: Response = super(CookiesMiddleware, self).process_response(
+            request, response, spider
+        )
 
         # read the cookie from the backend
         req: Request = copy(request)
@@ -195,9 +216,19 @@ class CookiesMiddleware(CM_Origin):
         )
         await page.setCookie(*self._convert_cookies(request.url, cookie))
 
-        await page.goto(request.url)
-        await page.waitForSelector(request.meta["waitForSelector"])
+        await page.goto(request.url, timeout=1000 * 60 * 5)
+        await page.waitForSelector(
+            request.meta["waitForSelector"], timeout=1000 * 60 * 5
+        )
 
         resp = Response(**response_kwargs)
+
+        # TODO: save the validated cookies
+        cookiejar = self.jars[request.meta.get("cookiejar")]
+        self.jars[request.meta.get("cookiejar")] = await self._extract_cookies(
+            cookiejar, page
+        )
+
+        # TODO: save the response into httpcache
 
         return resp
