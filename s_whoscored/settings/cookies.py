@@ -8,7 +8,7 @@ from s_whoscored.settings import DOWNLOADER_MIDDLEWARES, get_env
 DOWNLOADER_MIDDLEWARES.update(
     {
         "scrapy.downloadermiddlewares.cookies.CookiesMiddleware": None,
-        "s_whoscored.downloadermiddlewares.cookies.CookiesMiddleware": 700,
+        "scrapy_cookies.downloadermiddlewares.cookies.CookiesMiddleware": 700,
     }
 )
 
@@ -27,7 +27,3 @@ COOKIES_MONGO_MONGOCLIENT_KWARGS = {
     "authSource": "admin",
     "authMechanism": "SCRAM-SHA-1",
 }
-
-BROWSER_LEVEL = logging.WARNING
-WS_P_LOG_LEVEL = logging.WARNING
-WS_C_LOG_LEVEL = logging.WARNING
