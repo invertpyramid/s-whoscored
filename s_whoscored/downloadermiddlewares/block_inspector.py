@@ -6,13 +6,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from scrapy.crawler import Crawler
 from scrapy.exceptions import IgnoreRequest
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
 
+from s_whoscored.crawler import Crawler
 from s_whoscored.signals import response_blocked
 
 logger = logging.getLogger(__name__)
