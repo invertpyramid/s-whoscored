@@ -8,7 +8,6 @@ from typing import List, Optional
 
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
-from scrapy.exceptions import IgnoreRequest
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
@@ -17,6 +16,7 @@ from websockets.client import logger as WS_C_Logger
 from websockets.protocol import logger as WS_P_Logger
 
 from s_whoscored.crawler import Crawler
+from s_whoscored.downloadermiddlewares import as_deferred
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,6 @@ class BlockInspectorMiddleware:
         self.settings: Settings = crawler.settings
 
         self.browser: Optional[Browser] = None
-        self.crawler: Optional[Crawler] = None
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> BlockInspectorMiddleware:
@@ -56,7 +55,8 @@ class BlockInspectorMiddleware:
 
         return obj
 
-    def spider_opened(self, spider: Spider) -> None:
+    @as_deferred
+    async def spider_opened(self, spider: Spider, *args, **kwargs) -> None:
         """
         :param spider:
         :type spider: Spider
@@ -69,7 +69,8 @@ class BlockInspectorMiddleware:
             headless=False, logLevel=self.settings["BROWSER_LEVEL"]
         )
 
-    def spider_closed(self, spider: Spider) -> None:
+    @as_deferred
+    async def spider_closed(self, spider: Spider, *args, **kwargs) -> None:
         """
         :param spider:
         :type spider: Spider
@@ -112,4 +113,7 @@ class BlockInspectorMiddleware:
             return response
 
         self.crawler.stats.inc_value("whoscored/response_blocked")
-        raise IgnoreRequest
+
+        # TODO: add blocking resolve with pyppeteer
+
+        return response
