@@ -4,13 +4,17 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
-from typing import List
+from typing import List, Optional
 
+from pyppeteer.browser import Browser
+from pyppeteer.launcher import launch
 from scrapy.exceptions import IgnoreRequest
 from scrapy.http import Request, Response
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
+from websockets.client import logger as WS_C_Logger
+from websockets.protocol import logger as WS_P_Logger
 
 from s_whoscored.crawler import Crawler
 
@@ -31,6 +35,9 @@ class BlockInspectorMiddleware:
         self.crawler: Crawler = crawler
         self.settings: Settings = crawler.settings
 
+        self.browser: Optional[Browser] = None
+        self.crawler: Optional[Crawler] = None
+
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> BlockInspectorMiddleware:
         """
@@ -43,6 +50,10 @@ class BlockInspectorMiddleware:
         obj = cls(crawler=crawler)
         crawler.signals.connect(obj.spider_opened, spider_opened)
         crawler.signals.connect(obj.spider_closed, spider_closed)
+
+        WS_C_Logger.setLevel(crawler.settings["WS_C_LOG_LEVEL"])
+        WS_P_Logger.setLevel(crawler.settings["WS_P_LOG_LEVEL"])
+
         return obj
 
     def spider_opened(self, spider: Spider) -> None:
@@ -54,6 +65,10 @@ class BlockInspectorMiddleware:
         """
         logger.info("The middleware block inspector is up.")
 
+        self.browser: Browser = await launch(
+            headless=False, logLevel=self.settings["BROWSER_LEVEL"]
+        )
+
     def spider_closed(self, spider: Spider) -> None:
         """
         :param spider:
@@ -62,6 +77,8 @@ class BlockInspectorMiddleware:
         :rtype: None
         """
         logger.info("The middleware block inspector is down.")
+
+        await self.browser.close()
 
     def _validate_response(self, response: Response) -> bool:
         """
