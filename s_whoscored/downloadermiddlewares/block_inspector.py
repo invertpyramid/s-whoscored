@@ -13,7 +13,6 @@ from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
 
 from s_whoscored.crawler import Crawler
-from s_whoscored.signals import response_blocked
 
 logger = logging.getLogger(__name__)
 
@@ -94,9 +93,6 @@ class BlockInspectorMiddleware:
         """
         if self._validate_response(response):
             return response
-        else:
-            self.crawler.stats.inc_value("whoscored/response_blocked")
-            self.crawler.signals.send_catch_log(
-                response_blocked, request=request, response=response, spider=spider
-            )
-            raise IgnoreRequest
+
+        self.crawler.stats.inc_value("whoscored/response_blocked")
+        raise IgnoreRequest
