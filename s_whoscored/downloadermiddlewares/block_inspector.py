@@ -4,11 +4,12 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
 from scrapy.http import Request, Response
+from scrapy.selector.unified import Selector
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
@@ -81,7 +82,7 @@ class BlockInspectorMiddleware:
 
         await self.browser.close()
 
-    def _validate_response(self, response: Response) -> bool:
+    def _validate_response(self, response: Union[Response, str]) -> bool:
         """
 
         :param response:
@@ -89,6 +90,10 @@ class BlockInspectorMiddleware:
         :return:
         :rtype: bool
         """
+        if isinstance(response, str):
+            response: Selector = Selector(text=response)
+
+        response: Union[Response, Selector]
         names_in_meta: List[str] = response.xpath("/html/head/meta").xpath(
             "@name"
         ).extract()
