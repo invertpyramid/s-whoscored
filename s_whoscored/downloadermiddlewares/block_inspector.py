@@ -8,6 +8,7 @@ from typing import List, Optional, Union
 
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
+from pyppeteer.page import Page
 from scrapy.http import Request, Response
 from scrapy.selector.unified import Selector
 from scrapy.settings import Settings
@@ -82,6 +83,25 @@ class BlockInspectorMiddleware:
 
         await self.browser.close()
 
+    async def _process_pyppeteer_response(  # pylint: disable=bad-continuation
+        self, response: Response, request: Request, spider: Spider
+    ) -> Response:
+        """
+        TODO: resolve the blocked response
+        :param response:
+        :type response: Response
+        :param request:
+        :type request: Request
+        :param spider:
+        :type spider: Spider
+        :return:
+        :rtype: Response
+        """
+        page: Page = await self.browser.newPage()
+        await page.close()
+
+        return response
+
     def _validate_response(self, response: Union[Response, str]) -> bool:
         """
 
@@ -100,7 +120,7 @@ class BlockInspectorMiddleware:
 
         return "ROBOTS" not in names_in_meta
 
-    def process_response(  # pylint: disable=bad-continuation
+    async def process_response(  # pylint: disable=bad-continuation
         self, response: Response, request: Request, spider: Spider
     ) -> Response:
         """
@@ -119,6 +139,8 @@ class BlockInspectorMiddleware:
 
         self.crawler.stats.inc_value("whoscored/response_blocked")
 
-        # TODO: add blocking resolve with pyppeteer
+        resp: Response = await self._process_pyppeteer_response(
+            response, request, spider
+        )
 
-        return response
+        return resp
