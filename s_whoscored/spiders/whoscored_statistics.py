@@ -152,7 +152,7 @@ class WhoScoredStatisticsSpider(Spider):
                     id=team_.id
                 ),
                 callback=self.parse_team,
-                meta={"waitForSelector": "layout-content-wrapper"}
+                meta={"waitForSelector": "layout-content-wrapper"},
             )
 
             break
