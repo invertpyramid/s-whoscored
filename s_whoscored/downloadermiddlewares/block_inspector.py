@@ -106,14 +106,14 @@ class BlockInspectorMiddleware:
         cookiejar: CookieJar = self.crawler.signals.send_catch_log(
             get_cookiejar, response=response, request=request, spider=spider
         )[0][1]
-        repr_cookiejar: List[Dict[str, str]] = []
+        cookie_repr: List[Dict[str, str]] = []
         for x in cookiejar.make_cookies(response, request):
-            repr_cookiejar.append({})
+            cookie_repr.append({})
             for attr in filter(lambda y: not y.startswith("_"), dir(x)):
                 if not callable(getattr(x, attr)):
-                    repr_cookiejar[-1][attr] = getattr(x, attr)
+                    cookie_repr[-1][attr] = getattr(x, attr)
 
-        return repr_cookiejar
+        return cookie_repr
 
     def process_response(  # pylint: disable=bad-continuation
         self, response: Response, request: Request, spider: Spider
