@@ -4,13 +4,17 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
-from typing import List, Union
+from pprint import pformat
+from typing import Dict, List, Union
 
-from scrapy.http import Request, Response
+from scrapy.http.cookies import CookieJar
+from scrapy.http.request import Request
+from scrapy.http.response import Response
 from scrapy.selector.unified import Selector
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
+from scrapy_cookies.signals import get_cookiejar
 
 from s_whoscored.crawler import Crawler
 from s_whoscored.downloadermiddlewares import as_deferred
@@ -85,6 +89,32 @@ class BlockInspectorMiddleware:
 
         return "ROBOTS" not in names_in_meta
 
+    def _extract_cookie_repr(
+        self, response: Response, request: Request, spider: Spider
+    ) -> List[Dict[str, str]]:
+        """
+
+        :param response:
+        :type response: Response
+        :param request:
+        :type request: Request
+        :param spider:
+        :type spider: Spider
+        :return:
+        :rtype: List[Dict[str, str]]
+        """
+        cookiejar: CookieJar = self.crawler.signals.send_catch_log(
+            get_cookiejar, response=response, request=request, spider=spider
+        )[0][1]
+        repr_cookiejar: List[Dict[str, str]] = []
+        for x in cookiejar.make_cookies(response, request):
+            repr_cookiejar.append({})
+            for attr in filter(lambda y: not y.startswith("_"), dir(x)):
+                if not callable(getattr(x, attr)):
+                    repr_cookiejar[-1][attr] = getattr(x, attr)
+
+        return repr_cookiejar
+
     def process_response(  # pylint: disable=bad-continuation
         self, response: Response, request: Request, spider: Spider
     ) -> Response:
@@ -102,7 +132,13 @@ class BlockInspectorMiddleware:
         if self._validate_response(response):
             return response
 
+        logger.info("Response is blocked: %s", response.url)
         self.crawler.stats.inc_value("whoscored/response_blocked")
+
+        logger.info(
+            "The following cookie is invalidated:\n%s",
+            pformat(self._extract_cookie_repr(response, request, spider)),
+        )
 
         # TODO: fix the block
 
