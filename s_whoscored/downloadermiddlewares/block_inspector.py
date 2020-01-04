@@ -4,7 +4,7 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from scrapy.http.request import Request
 from scrapy.http.response import Response
@@ -109,8 +109,6 @@ class BlockInspectorMiddleware:
 
         logger.info("Response is blocked: %s", response.url)
         self.crawler.stats.inc_value("whoscored/response_blocked")
-
-        # TODO: fix the block
 
         results = yield self.crawler.signals.send_catch_log_deferred(
             response_blocked, request=request, response=response, spider=spider
