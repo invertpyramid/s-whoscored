@@ -4,7 +4,7 @@ A middleware for block inspection by response
 from __future__ import annotations
 
 import logging
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from scrapy.http.request import Request
 from scrapy.http.response import Response
@@ -12,9 +12,12 @@ from scrapy.selector.unified import Selector
 from scrapy.settings import Settings
 from scrapy.signals import spider_closed, spider_opened
 from scrapy.spiders import Spider
+from twisted.internet.defer import inlineCallbacks
 
 from s_whoscored.crawler import Crawler
 from s_whoscored.downloadermiddlewares import as_deferred
+from s_whoscored.extensions.pyppeteer import Pyppeteer
+from s_whoscored.signals import response_blocked
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +89,7 @@ class BlockInspectorMiddleware:
 
         return "ROBOTS" not in names_in_meta
 
+    @inlineCallbacks
     def process_response(  # pylint: disable=bad-continuation
         self, response: Response, request: Request, spider: Spider
     ) -> Response:
@@ -108,4 +112,11 @@ class BlockInspectorMiddleware:
 
         # TODO: fix the block
 
-        return response
+        results = yield self.crawler.signals.send_catch_log_deferred(
+            response_blocked, request=request, response=response, spider=spider
+        )
+
+        for result in results:
+            method, response = result
+            if isinstance(method.__self__, Pyppeteer):
+                return response
