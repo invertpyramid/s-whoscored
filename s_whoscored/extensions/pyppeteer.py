@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional
 
+from pyppeteer.browser import Browser, BrowserContext
+from pyppeteer.launcher import launch
+from pyppeteer.page import Page
 from scrapy.crawler import Crawler
 from scrapy.http.request import Request
 from scrapy.http.response import Response
@@ -27,6 +31,8 @@ class Pyppeteer:
         self.crawler = crawler
         self.settings = settings
 
+        self.browser: Optional[Browser] = None
+
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Pyppeteer:
         """
@@ -42,29 +48,50 @@ class Pyppeteer:
         crawler.signals.connect(obj.fix_blocked_response, response_blocked)
         return obj
 
-    def spider_opened(self, spider: Spider) -> None:
+    @as_deferred
+    async def spider_opened(
+        self, spider: Spider, signal: object, sender: Crawler
+    ) -> None:
         """
 
         :param spider:
         :type spider: Spider
+        :param signal:
+        :type signal: object
+        :param sender:
+        :type sender: Crawler
         :return:
         :rtype: None
         """
-        pass
+        self.browser = await launch(headless=False)
 
-    def spider_closed(self, spider: Spider) -> None:
+    @as_deferred
+    async def spider_closed(
+        self, spider: Spider, signal: object, sender: Crawler, reason: str
+    ) -> None:
         """
 
         :param spider:
         :type spider: Spider
+        :param signal:
+        :type signal: object
+        :param sender:
+        :type sender: Crawler
+        :param reason:
+        :type reason: str
         :return:
         :rtype: None
         """
-        pass
+        await self.browser.close()
 
     @as_deferred
     async def fix_blocked_response(
-        self, request: Request, response: Response, spider: Spider, *args, **kwargs
+        self,
+        request: Request,
+        response: Response,
+        spider: Spider,
+        signal: object,
+        sender: Crawler,
     ) -> Response:
         """
 
@@ -74,7 +101,20 @@ class Pyppeteer:
         :type response: Response
         :param spider:
         :type spider: Spider
+        :param signal:
+        :type signal: object
+        :param sender:
+        :type sender: Crawler
         :return:
         :rtype: Response
         """
+        context: BrowserContext = await self.browser.createIncognitoBrowserContext()
+        page: Page = await context.newPage()
+
+        # TODO: fix blocked response
+        await page.goto(response.url)
+
+        await page.close()
+        await context.close()
+
         return response
