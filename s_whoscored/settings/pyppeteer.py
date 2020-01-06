@@ -7,7 +7,12 @@ Configure pyppeteer in this spider
 import logging
 
 import pyppeteer.connection
+from websockets.client import logger as WSCLogger
 from websockets.protocol import logger as WSPLogger
+
+from s_whoscored.settings import EXTENSIONS
+
+EXTENSIONS.update({"s_whoscored.extensions.pyppeteer.Pyppeteer": 0})
 
 original_method = pyppeteer.connection.websockets.client.connect
 
@@ -25,4 +30,8 @@ def new_method(*args, **kwargs):
 
 
 pyppeteer.connection.websockets.client.connect = new_method
-WSPLogger.setLevel(logging.WARNING)
+
+PYPPETEER_LOG_LEVEL = logging.WARNING
+
+WSCLogger.setLevel(PYPPETEER_LOG_LEVEL)
+WSPLogger.setLevel(PYPPETEER_LOG_LEVEL)
